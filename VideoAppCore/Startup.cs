@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VideoAppCore.Areas.Identity;
 using VideoAppCore.Data;
+using VideoAppCore.Models;
 
 namespace VideoAppCore
 {
@@ -40,6 +41,10 @@ namespace VideoAppCore
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddSingleton<WeatherForecastService>();
+
+            //신규 DBContext 등록
+            services.AddEntityFrameworkSqlServer().AddDbContext<VideoDBContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
