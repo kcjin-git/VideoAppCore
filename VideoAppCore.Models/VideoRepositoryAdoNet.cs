@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace VideoAppCore.Models
 {
     /// <summary>
-    /// [4][1] Ado.net을 이용한 CRUD
+    /// [4][1][1]    Ado.net을 이용한 CRUD
     /// </summary>
     public class VideoRepositoryAdoNet : IVideoRepository
     {
@@ -33,5 +33,4 @@ namespace VideoAppCore.Models
             throw new NotImplementedException();
         }
     }
-
 }

@@ -1,37 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace VideoAppCore.Models
 {
     /// <summary>
-    /// [4][3][1] EfCore를 이용한 CRUD
+    /// [4][1][2] Ado.net을 이용한 ASync CRUD
     /// </summary>
-    public class VideoRepositoryEfCore : IVideoRepository
+    public class VideoRepositoryAdoNetASync : IVideoRepositoryASync
     {
-        public Video Add(Video model)
+        public Task<Video> Add(Video model)
         {
             throw new NotImplementedException();
         }
 
-        public Video GetVideoById(int id)
+        public Task<Video> GetVideoById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public List<Video> GetVideos()
+        public Task<List<Video>> GetVideos()
         {
             throw new NotImplementedException();
         }
 
-        public void RemoveVideo(int id)
+        public Task RemoveVideo(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Video UpdateVideo(Video model)
+        public Task<Video> UpdateVideo(Video model)
         {
             throw new NotImplementedException();
         }
     }
-
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace VideoAppCore.Models
 {
     /// <summary>
-    /// [4][2] Dapper를 이용한 CRUD
+    /// [4][2][1] Dapper를 이용한 CRUD
     /// </summary>    
     public class VideoRepositoryDapper : IVideoRepository
     {
@@ -33,5 +33,4 @@ namespace VideoAppCore.Models
             throw new NotImplementedException();
         }
     }
-
 }
