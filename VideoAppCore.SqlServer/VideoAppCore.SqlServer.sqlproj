@@ -62,5 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="VideoAppCore.SqlServer.publish.xml" />
+    <None Include="VideoAppCore_1.SqlServer.publish.xml" />
   </ItemGroup>
 </Project>

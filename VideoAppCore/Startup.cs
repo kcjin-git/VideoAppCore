@@ -44,7 +44,10 @@ namespace VideoAppCore
 
             //신규 DBContext 등록
             services.AddEntityFrameworkSqlServer().AddDbContext<VideoDBContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))); 
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            //DI Container에 서비스 등록
+            services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

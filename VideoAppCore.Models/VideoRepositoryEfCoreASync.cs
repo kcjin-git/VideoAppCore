@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,29 +10,48 @@ namespace VideoAppCore.Models
     /// </summary>
     public class VideoRepositoryEfCoreASync : IVideoRepositoryASync
     {
-        public Task<Video> Add(Video model)
+        private readonly VideoDBContext _context;
+
+        public VideoRepositoryEfCoreASync(VideoDBContext context)
         {
-            throw new NotImplementedException();
+            this._context = context;
+        }
+        public async Task<Video> Add(Video model)
+        {
+            _context.Add(model);
+
+            await _context.SaveChangesAsync();
+
+            return model;
         }
 
-        public Task<Video> GetVideoById(int id)
+        public async Task<Video> GetVideoById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Videos.FindAsync(id);
         }
 
-        public Task<List<Video>> GetVideos()
+        public async Task<List<Video>> GetVideos()
         {
-            throw new NotImplementedException();
+            return await _context.Videos.ToListAsync();
         }
 
-        public Task RemoveVideo(int id)
+        public async Task RemoveVideo(int id)
         {
-            throw new NotImplementedException();
+            var video = await _context.Videos.FindAsync(id);
+            if(video != null)
+            {
+                _context.Videos.Remove(video);
+
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task<Video> UpdateVideo(Video model)
+        public async Task<Video> UpdateVideo(Video model)
         {
-            throw new NotImplementedException();
+            _context.Entry(model).State = EntityState.Modified;
+            _context.SaveChangesAsync();
+
+            return model;
         }
     }
 
