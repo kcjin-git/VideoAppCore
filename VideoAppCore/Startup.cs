@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using VideoAppCore.Areas.Identity;
 using VideoAppCore.Data;
 using VideoAppCore.Models;
+using VideoAppCore.Data.Models;
 
 namespace VideoAppCore
 {
@@ -35,8 +36,10 @@ namespace VideoAppCore
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+            
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+           
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
@@ -46,8 +49,14 @@ namespace VideoAppCore
             services.AddEntityFrameworkSqlServer().AddDbContext<VideoDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            
+            string dataConnectionString = Configuration.GetConnectionString("DefaultConnection");
+
             //DI Container에 서비스 등록
+            services.AddTransient<IReportAsync, ReportEfCoreAsync>();
+            services.AddTransient<IUserAsync, UserEfCoreAsync>();
             services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
+            //services.AddTransient<IReportAsync>(s => new ReportDapperAsync(dataConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

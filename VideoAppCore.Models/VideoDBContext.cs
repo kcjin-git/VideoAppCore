@@ -34,5 +34,7 @@ namespace VideoAppCore.Models
         }
 
         public DbSet<Video> Videos { get; set; }
+
+       // public DbSet<Report> Reports { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace VideoAppCore.Models
         Task<Video> GetVideoById(int id);
         Task<Video> UpdateVideo(Video model);
         Task  RemoveVideo(int id);
-
     }
+
 
 }

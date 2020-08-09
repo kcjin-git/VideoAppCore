@@ -1,0 +1,68 @@
+﻿
+@page "/auth/login"
+
+@using VideoAppCore.Data.Models
+
+@inject IUserAsync userSvc
+@inject IJSRuntime JSRuntime
+
+
+<EditForm Model="@user" OnSubmit="@Save">
+
+    <div class="wrap-input100 validate-input m-b-26" data-validate="e-mail is required">
+        <span class="label-input100">E-Mail</span>
+        <InputText class="input100" type="text" name="email" @bind-Value="@user.EMAIL" placeholder="Enter e-mail" />
+        <span class="focus-input100"></span>
+    </div>
+
+    <div class="wrap-input100 validate-input m-b-26" data-validate="password is required">
+        <span class="label-input100">Password</span>
+        <InputText class="input100" type="password" name="password" @bind-Value="@user.PASSWORD" placeholder="Enter password" />
+        <span class="focus-input100"></span>
+    </div>
+
+
+    <button type="submit">Login</button>
+
+</EditForm>
+
+
+
+
+@code {
+
+    User user = new User();
+
+    protected async Task OnBtnClick()
+    {
+        /*
+        user.CREATOR = "null";
+
+        user.ORGN_NAME = "고객DX솔루션팀";
+        user.PART_NAME = "AntBot";
+        user.USER_NAME = "진광철";
+
+            */
+
+        user = await userSvc.AddUserAsync(user);
+
+        user = await userSvc.GetUserByIdAsync(user.USER_ID);
+
+    }
+
+    public async Task Save()
+    {
+        User userInfo = new User();
+        userInfo = await userSvc.LogIn(user.EMAIL, user.PASSWORD);
+        if(userInfo == null)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "login failed");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "login succeed");
+        }
+
+    }
+
+}

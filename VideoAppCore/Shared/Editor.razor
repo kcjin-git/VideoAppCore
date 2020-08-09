@@ -1,0 +1,21 @@
+﻿@page "/Editor"
+@inject IJSRuntime JSRuntime;
+
+<form>
+    <textarea   class="text-editor edit" rows="20"></textarea>
+</form>
+
+<button onclick="Clicked">text</button>
+@code 
+{ 
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("addEventListener");
+        base.OnAfterRender(firstRender);
+    }
+
+    protected void Clicked()
+    {
+
+    }
+}

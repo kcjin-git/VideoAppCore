@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace VideoAppCore.Models
@@ -32,6 +33,7 @@ namespace VideoAppCore.Models
 
         public async Task<List<Video>> GetVideos()
         {
+            //return await _context.Videos.FromSql<Video>("select * from videos").ToListAsync();
             return await _context.Videos.ToListAsync();
         }
 

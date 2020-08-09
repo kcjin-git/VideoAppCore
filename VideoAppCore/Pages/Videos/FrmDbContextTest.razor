@@ -3,33 +3,86 @@
 
 @using VideoAppCore.Models
 
-@inject VideoDBContext videoDbContext 
+@inject VideoDBContext videoDbContext
 
 @inject IVideoRepositoryASync repository
+@inject IReportAsync reportSvc
+@inject IJSRuntime JSRuntime;
 
-<h3>FrmDbContextTest</h3>
 
-@if (videos == null)
+<div class="row">
+    <div class="col-lg-6 portfolio-item">
+        <div class="card h-100">
+            <h4 class="breadcrumb">
+                This Week
+            </h4>
+            <div class="card-body">
+                <textarea id="thisWeek" name="editordata"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 portfolio-item">
+        <div class="card h-100">
+            <h4 class="breadcrumb">
+                Next Week
+            </h4>
+            <div class="card-body">
+                <textarea id="nextWeek" name="editordata"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--textarea id="summernote" name="editordata"></!-textarea -->
+<button @onclick="getEditorContent">Get Data</button>
+
+@thisWeekContent
+@nextWeekContent
+
+@if (reports == null)
 {
     <text> ... </text>
 }
 else
 {
     <ul>
-        @foreach (var video in videos)
+        @foreach (var report in reports)
         {
-            <li> @video.Id - @video.Title </li>
+            <li> @report.REPORT_TITLE - @report.REPORT_CONTENT </li>
         }
     </ul>
 }
 
-@code { 
+@code {
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("addEventListener", "thisWeek");
+        await JSRuntime.InvokeVoidAsync("addEventListener", "nextWeek");
+        base.OnAfterRender(firstRender);
+    }
 
-    List<Video> videos  = new List<Video>();
+    protected string thisWeekContent;
+    protected string nextWeekContent;
+
+    private async Task getEditorContent()
+    {
+        thisWeekContent = await JSRuntime.InvokeAsync<string>("getData", "thisWeek");
+        nextWeekContent = await JSRuntime.InvokeAsync<string>("getData", "nextWeek");
+
+        //await JSRuntime.InvokeVoidAsync("alert", text);
+
+    }
+
+
+    List<Video> videos = new List<Video>();
+
+    List<Report> reports;
 
     protected override async Task OnInitializedAsync()
     {
         videos = await repository.GetVideos();
+
+        reports = await reportSvc.GetReportListAsync();
     }
 
 
