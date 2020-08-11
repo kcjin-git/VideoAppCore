@@ -71,14 +71,14 @@
 
             await sessionStorage.SetItemAsync("UserName", userInfo.USER_NAME);
             await sessionStorage.SetItemAsync("EMailAddr", userInfo.EMAIL);
-            await sessionStorage.SetItemAsync("OrgnNae", userInfo.ORGN_NAME);
+            await sessionStorage.SetItemAsync("OrgnName", userInfo.ORGN_NAME);
 
             //var name = await sessionStorage.GetItemAsync<string>("name");
 
 
             await JSRuntime.InvokeVoidAsync("alert", "login succeed");
 
-            //NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/");
         }
 
     }

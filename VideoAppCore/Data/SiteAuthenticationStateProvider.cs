@@ -44,12 +44,12 @@ namespace VideoAppCore.Data
             return await Task.FromResult(new AuthenticationState(user));
         }
 
-        public void SetAuthenticationStateAsync(string email, string userName, string orgnName)
+        public void SetAuthenticationStateAsync(string emailAddr, string userName, string orgnName)
         {
             var identity = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Email, emailAddr),
                 new Claim(ClaimTypes.GroupSid, orgnName)
             }, "apiauth_type");
 
