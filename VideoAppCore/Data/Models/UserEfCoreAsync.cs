@@ -76,18 +76,7 @@ namespace VideoAppCore.Data.Models
 
             User usr = await _context.Users.FromSqlRaw<User>(query, email, password).FirstOrDefaultAsync();
 
-            ClaimsIdentity identity = null;
-            bool isAuthenticated = false;
-
-            //Create the identity for the user
-            identity = new ClaimsIdentity(new[] {
-                            new Claim(ClaimTypes.Email, email),
-                            new Claim(ClaimTypes.Name, usr.USER_NAME),
-                            new Claim(ClaimTypes.GroupSid, usr.ORGN_NAME),
-                            new Claim(ClaimTypes.Role, "Admin")
-                       }, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            isAuthenticated = true;
+            
 
 
             return usr;
