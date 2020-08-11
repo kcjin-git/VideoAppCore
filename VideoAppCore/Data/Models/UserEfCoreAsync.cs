@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace VideoAppCore.Data.Models
@@ -72,7 +74,26 @@ namespace VideoAppCore.Data.Models
         {
             string query = "SELECT top(1) * FROM USERS WHERE EMAIL = {0} AND PASSWORD = {1} ";
 
-            return await _context.Users.FromSqlRaw<User>(query, email, password).FirstOrDefaultAsync();
+            User usr = await _context.Users.FromSqlRaw<User>(query, email, password).FirstOrDefaultAsync();
+
+            ClaimsIdentity identity = null;
+            bool isAuthenticated = false;
+
+            //Create the identity for the user
+            identity = new ClaimsIdentity(new[] {
+                            new Claim(ClaimTypes.Email, email),
+                            new Claim(ClaimTypes.Name, usr.USER_NAME),
+                            new Claim(ClaimTypes.GroupSid, usr.ORGN_NAME),
+                            new Claim(ClaimTypes.Role, "Admin")
+                       }, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            isAuthenticated = true;
+
+
+            return usr;
+            
+            //return View();
+
         }
 
     }

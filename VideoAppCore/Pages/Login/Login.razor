@@ -5,6 +5,10 @@
 
 @inject IUserAsync userSvc
 @inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@inject NavigationManager NavigationManager
 
 
 <EditForm Model="@user" OnSubmit="@Save">
@@ -54,13 +58,27 @@
     {
         User userInfo = new User();
         userInfo = await userSvc.LogIn(user.EMAIL, user.PASSWORD);
-        if(userInfo == null)
+
+
+        if (userInfo == null)
         {
             await JSRuntime.InvokeVoidAsync("alert", "login failed");
         }
         else
         {
+            ((SiteAuthenticationStateProvider)AuthenticationStateProvider).SetAuthenticationStateAsync(userInfo.EMAIL, userInfo.USER_NAME, userInfo.ORGN_NAME);
+
+
+            await sessionStorage.SetItemAsync("UserName", userInfo.USER_NAME);
+            await sessionStorage.SetItemAsync("EMailAddr", userInfo.EMAIL);
+            await sessionStorage.SetItemAsync("OrgnNae", userInfo.ORGN_NAME);
+
+            //var name = await sessionStorage.GetItemAsync<string>("name");
+
+
             await JSRuntime.InvokeVoidAsync("alert", "login succeed");
+
+            //NavigationManager.NavigateTo("/");
         }
 
     }

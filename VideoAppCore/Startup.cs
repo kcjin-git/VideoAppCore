@@ -17,6 +17,8 @@ using VideoAppCore.Areas.Identity;
 using VideoAppCore.Data;
 using VideoAppCore.Models;
 using VideoAppCore.Data.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Blazored.SessionStorage;
 
 namespace VideoAppCore
 {
@@ -57,6 +59,10 @@ namespace VideoAppCore
             services.AddTransient<IUserAsync, UserEfCoreAsync>();
             services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
             //services.AddTransient<IReportAsync>(s => new ReportDapperAsync(dataConnectionString));
+
+            services.AddScoped<AuthenticationStateProvider, SiteAuthenticationStateProvider>();
+            services.AddBlazoredSessionStorage();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,6 +94,8 @@ namespace VideoAppCore
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
+            
         }
     }
 }
