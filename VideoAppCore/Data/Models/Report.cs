@@ -14,7 +14,7 @@ namespace VideoAppCore.Data.Models
         public DateTime END_DATE { get; set; }
 
         public string ORGN_NAME { get; set; }
-        public string PART_NAME { get; set; }
+        public string MODULE_NAME { get; set; }
         public string USER_NAME { get; set; }
      
         public string REPORT_TITLE { get; set; }

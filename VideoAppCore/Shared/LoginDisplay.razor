@@ -3,8 +3,9 @@
 
 <AuthorizeView>
     <Authorized>
+
         <a href="Identity/Account/Manage">@context.User.Identity.Name</a>
-        <form >
+        <form>
             <a href="/auth/login" class="nav-link btn btn-link" @onclick="(()=>Logout())">Logout</a>
         </form>
     </Authorized>

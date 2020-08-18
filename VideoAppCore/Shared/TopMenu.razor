@@ -1,0 +1,54 @@
+﻿
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+<link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="css/business-frontpage.css" rel="stylesheet">
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">고객5G솔루션팀</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">
+                        Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Report/WeeklyReport">WeeklyReport</a>
+                </li>
+                <li class="nav-item">
+                    <AuthorizeView>
+                        <Authorized>
+                            <!--a href="Identity/Account/Manage">@context.User.Identity.Name</a-->
+                            <form>
+                                <a href="/" class="nav-link btn btn-link" @onclick="(()=>Logout())">Logout</a>
+                            </form>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a href="/auth/login">Login</a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Counter">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+@code
+{ public void Logout()
+            {
+                ((SiteAuthenticationStateProvider)AuthenticationStateProvider).LogOutAuthenticationStateAsync();
+            } }

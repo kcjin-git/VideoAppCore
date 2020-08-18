@@ -62,7 +62,7 @@ namespace VideoAppCore.Data.Models
 
             return model;
         }
-        public async Task<Report> GetReportByDate(DateTime workDate)
+        public async Task<Report> GetReportByDate(string sEmail, DateTime workDate)
         {
             string query = "SELECT top(1) * FROM REPORTS WHERE {0} BETWEEN STRT_DATE AND END_DATE";
 
@@ -71,7 +71,14 @@ namespace VideoAppCore.Data.Models
 
             return await _context.Reports.FromSqlRaw<Report>(query, workDate).FirstOrDefaultAsync();
         }
-
+        public async Task<Report> GetReportsByModuleName(string orgn_name, DateTime report_date)
+        {
+            return null;
+        }
+        public async Task<List<Report>> GetReportsByOrgnName(string orgn_name, DateTime report_date)
+        {
+            return null;
+        }
     }
 
 }

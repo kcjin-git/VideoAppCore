@@ -11,24 +11,32 @@
 @inject NavigationManager NavigationManager
 
 
-<EditForm Model="@user" OnSubmit="@Save">
+    <div class="wrapper fadeInDown vcenter" >
+        <div id="formContent">
+            <!-- Tabs Titles -->
+            <h2 class="active"> Sign In </h2>
+            <h2 class="inactive underlineHover">Sign Up </h2>
 
-    <div class="wrap-input100 validate-input m-b-26" data-validate="e-mail is required">
-        <span class="label-input100">E-Mail</span>
-        <InputText class="input100" type="text" name="email" @bind-Value="@user.EMAIL" placeholder="Enter e-mail" />
-        <span class="focus-input100"></span>
+            <!-- Icon -->
+            <div class="fadeIn first" py="10">
+                <img src="/img/ktds_logo.png"   />
+            </div>
+
+            <!-- Login Form -->
+            <EditForm Model="@user" OnSubmit="@Save">
+                <InputText type="text" id="email" class="fadeIn second" name="email" placeholder="email" @bind-Value="@user.EMAIL" />
+                <InputText type="text" id="password" class="fadeIn third" name="login" placeholder="password" @bind-Value="@user.PASSWORD"  />
+                <input type="submit" class="fadeIn fourth" value="Log In">
+            </EditForm>
+
+                <!-- Remind Passowrd -->
+           <div id="formFooter">
+                    <a class="underlineHover" href="#">Forgot Password?</a>
+           </div>
+
+        </div>
     </div>
 
-    <div class="wrap-input100 validate-input m-b-26" data-validate="password is required">
-        <span class="label-input100">Password</span>
-        <InputText class="input100" type="password" name="password" @bind-Value="@user.PASSWORD" placeholder="Enter password" />
-        <span class="focus-input100"></span>
-    </div>
-
-
-    <button type="submit">Login</button>
-
-</EditForm>
 
 
 
@@ -76,7 +84,7 @@
             //var name = await sessionStorage.GetItemAsync<string>("name");
 
 
-            await JSRuntime.InvokeVoidAsync("alert", "login succeed");
+            //await JSRuntime.InvokeVoidAsync("alert", "login succeed");
 
             NavigationManager.NavigateTo("/");
         }

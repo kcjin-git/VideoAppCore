@@ -6,166 +6,107 @@
 @inject IJSRuntime JSRuntime;
 
 
-@if (thisWeekReport != null)
-{
-    <h3>@thisWeekReport.REPORT_TITLE</h3>
-}
-else
-{
-    <h3>WeeklyReport</h3>
-}
 
-<button @onclick="OnBtnClick" class="glyphicon-floppy-save"> 저장 </button>
-
-<div class="row">
-    <div class="col-xl-6 portfolio-item">
-        <div class="card h-100">
-            <div class="card-header">
-                <label class="px-4"> This Week </label>
-                <input type="date" @bind="thisWeekReport.STRT_DATE" @bind:format="yyyy-MM-dd" />
-                <label class="px-2"> ~ </label>
-                <input type="date" @bind="thisWeekReport.END_DATE" @bind:format="yyyy-MM-dd" />
-            </div>
-            <div class="card-body">
-                <textarea id="thisWeek" name="editordata"></textarea>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-6 portfolio-item">
-        <div class="card h-100">
-            <div class="card-header">
-                <label class="px-4"> Next Week </label>
-                <input type="date" @bind="nextWeekReport.STRT_DATE" @bind:format="yyyy-MM-dd" />
-                <label class="px-2"> ~ </label>
-                <input type="date" @bind="nextWeekReport.END_DATE" @bind:format="yyyy-MM-dd" />
-            </div>
-            <div class="card-body">
-                <textarea id="nextWeek" name="editordata"></textarea>
-            </div>
-        </div>
-    </div>
+<div class="row align-content-xl-end" >
+    <button class="btn btn-primary m-2" @onclick="OnSave"> 저 장 </button>
+    <button class="btn btn-primary m-2" @onclick="OnQuery"> 조 회 </button>
+    <button class="btn btn-primary m-2" @onclick="OnClear"> 신 규</button>
 </div>
 
+    <div class="row">
+        <div class="col-xl-6 portfolio-item">
+
+            <ReportComponent StrtDate="@_thisWeekStrtDate" EndDate="@_thisWeekEndDate" EditorId="thisWeek" @ref="thisWeekComp" SaveSucceed="OnSaveCompleted"  />
+
+            <!--
+            <div class="card h-100">
+                <div class="card-header">
+                    <label class="px-4"> This Week </label>
+                    <input type="date" @bind="thisWeekReport.STRT_DATE" @bind:format="yyyy-MM-dd" />
+                    <label class="px-2"> ~ </label>
+                    <input type="date" @bind="thisWeekReport.END_DATE" @bind:format="yyyy-MM-dd" />
+                </div>
+                <div class="card-body">
+                    <textarea id="thisWeek" name="editordata"></textarea>
+                </div>
+            </div>
+                -->
+        </div>
+
+        <div class="col-xl-6 portfolio-item">
+
+            <ReportComponent StrtDate="@_nextWeekStrtDate" EndDate="@_nextWeekEndDate" EditorId="nextWeek" @ref="nextWeekComp" SaveSucceed="OnSaveCompleted" />
+
+            <!--
+            <div class="card h-100">
+                <div class="card-header">
+                    <label class="px-4"> Next Week </label>
+                    <input type="date" @bind="nextWeekReport.STRT_DATE" @bind:format="yyyy-MM-dd" />
+                    <label class="px-2"> ~ </label>
+                    <input type="date" @bind="nextWeekReport.END_DATE" @bind:format="yyyy-MM-dd" />
+                </div>
+                <div class="card-body">
+                    <textarea id="nextWeek" name="editordata"></textarea>
+                </div>
+            </div>
+                -->
+        </div>
+    </div>
+
+    @code {
+
+        ReportComponent thisWeekComp, nextWeekComp;
+
+        private string _thisWeekStrtDate, _thisWeekEndDate;
+        private string _nextWeekStrtDate, _nextWeekEndDate;
+        private int _save_count;
 
 
-
-
-@code {
-
-    private string _thisWeekStrtDate;
-    private string _thisWeekEndDate;
-
-    public string thisWeekStrtDate { get => _thisWeekStrtDate; set { _thisWeekStrtDate = value; } }
-    public string thisWeekEndDate { get => _thisWeekEndDate; set { _thisWeekEndDate = value; } }
-
-    Report thisWeekReport = new Report();
-    Report nextWeekReport = new Report();
-
-    protected override async void OnAfterRender(bool firstRender)
-    {
-        await JSRuntime.InvokeVoidAsync("addEventListener", "thisWeek");
-        await JSRuntime.InvokeVoidAsync("addEventListener", "nextWeek");
-        base.OnAfterRender(firstRender);
-
-        if (!firstRender)
-            return;
-
-        int delta = DayOfWeek.Monday - DateTime.Today.DayOfWeek;
-        DateTime monday = DateTime.Today.AddDays(delta);
-        DateTime sunday = monday.AddDays(6);
-
-
-        thisWeekReport = await reportSvc.GetReportByDate(DateTime.Today);
-        if (thisWeekReport != null)
+        public DateTime getMondayDate(DateTime dt)
         {
-            await JSRuntime.InvokeAsync<string>("setData", "thisWeek", thisWeekReport.REPORT_CONTENT);
-        }
-        else
-        {
-            thisWeekReport = new Report(DateTime.Today);
-
-            /*
-            thisWeekReport.STRT_DATE = monday;
-            thisWeekReport.END_DATE = sunday;
-            thisWeekReport.REPORT_TITLE = monday.ToString("M") + "월 " + GetWeekOfMonth(monday).ToString() + "주 주간보고";
-            */
-        }
-
-        nextWeekReport = await reportSvc.GetReportByDate(DateTime.Today.AddDays(7));
-        if (nextWeekReport != null)
-        {
-            await JSRuntime.InvokeAsync<string>("setData", "nextWeek", nextWeekReport.REPORT_CONTENT);
-        }
-        else
-        {
-            nextWeekReport = new Report(DateTime.Today.AddDays(7));
-            /*
-            nextWeekReport.STRT_DATE = monday.AddDays(7);
-            nextWeekReport.END_DATE = sunday.AddDays(7);
-            nextWeekReport.REPORT_TITLE = monday.ToString("M") + "월 " + GetWeekOfMonth(monday).ToString() + "주 주간보고";
-            */
+            return dt.AddDays(DayOfWeek.Monday - dt.DayOfWeek);
         }
 
 
-        thisWeekStrtDate = Convert.ToDateTime(thisWeekReport.STRT_DATE).ToString("yyyy-MM-dd");
-        thisWeekEndDate = Convert.ToDateTime(thisWeekReport.END_DATE).ToString("yyyy-MM-dd");
+        protected override Task OnInitializedAsync()
+        {
+            _thisWeekStrtDate = this.getMondayDate(DateTime.Today).ToString("yyyy-MM-dd");
+            _thisWeekEndDate = this.getMondayDate(DateTime.Today).AddDays(6).ToString("yyyy-MM-dd");
+            _nextWeekStrtDate = this.getMondayDate(DateTime.Today).AddDays(7).ToString("yyyy-MM-dd");
+            _nextWeekEndDate = this.getMondayDate(DateTime.Today).AddDays(13).ToString("yyyy-MM-dd");
 
-        StateHasChanged();
+            return base.OnInitializedAsync();
+        }
 
-        //await JSRuntime.InvokeAsync<string>("alert", thisWeekStrtDate + ":" + thisWeekEndDate);
+        protected async Task OnSave()
+        {
+            _save_count = 0;
 
+            await thisWeekComp.Save();
+            await nextWeekComp.Save();
+        }
+
+        protected async Task OnQuery()
+        {
+            await thisWeekComp.Query(0, _thisWeekStrtDate);
+            await nextWeekComp.Query(0, _nextWeekStrtDate);
+        }
+
+        protected async Task OnClear()
+        {
+            await thisWeekComp.Clear(_thisWeekStrtDate, _thisWeekEndDate);
+            await nextWeekComp.Clear(_nextWeekStrtDate, _nextWeekEndDate);
+        }
+
+
+        public void OnSaveCompleted(Report report)
+        {
+            _save_count++;
+
+            if(_save_count >= 2)
+            {
+                JSRuntime.InvokeVoidAsync("alert", "save succeed...");
+            }
+        }
     }
 
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
-
- 
-
-    protected async Task OnBtnClick()
-    {
-        thisWeekReport.CREATOR = "test";
-
-        thisWeekReport.ORGN_NAME = "고객DX솔루션팀";
-        thisWeekReport.PART_NAME = "AntBot";
-        thisWeekReport.USER_NAME = "진광철";
-        thisWeekReport.REPORT_CONTENT = await JSRuntime.InvokeAsync<string>("getData", "thisWeek");
-
-        thisWeekReport = await reportSvc.AddReportAsync(thisWeekReport);
-
-        thisWeekReport = await reportSvc.GetReportByIdAsync(thisWeekReport.REPORT_ID);
-
-
-        //savedReport.REPORT_CONTENT = "<p> Report ID : " + savedReport.REPORT_ID.ToString() + "</p>" + savedReport.REPORT_CONTENT;
-
-        await JSRuntime.InvokeAsync<string>("setData", "thisWeek", thisWeekReport.REPORT_CONTENT);
-
-    }
-
-    public static int GetWeekOfYear(DateTime date)
-    {
-        if (date == null)
-            return 0;
-
-        DateTimeFormatInfo dfi = DateTimeFormatInfo.CurrentInfo;
-        Calendar cal = dfi.Calendar;
-
-        return cal.GetWeekOfYear(date, dfi.CalendarWeekRule, dfi.FirstDayOfWeek);
-    }
-
-
-    public static int GetWeekOfMonth(DateTime date)
-    {
-        if (date == null)
-            return 0;
-
-        return GetWeekOfYear(date) - GetWeekOfYear(new DateTime(date.Year, date.Month, 1)) + 1;
-    }
-
-    public DateTime getMondayDate(DateTime dt)
-    {
-        return dt.AddDays(DayOfWeek.Monday - dt.DayOfWeek);
-    }
-}

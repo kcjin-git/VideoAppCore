@@ -1,16 +1,25 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <TopMenu />
+                    </div>
+                </div>
 
-<div class="main">
-    <div class="top-row px-4 auth">
-        <LoginDisplay />
-        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-    </div>
 
-    <div class="content px-4">
-        @Body
-    </div>
-</div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        @Body
+                    </div>
+                </div>
+            </div>          
+        </Authorized>
+
+        <NotAuthorized>
+            <VideoAppCore.Pages.Login.Login/>
+        </NotAuthorized>
+
+    </AuthorizeView>

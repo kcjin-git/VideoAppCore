@@ -56,11 +56,16 @@ namespace VideoAppCore
 
             //DI Container에 서비스 등록
             services.AddTransient<IReportAsync, ReportEfCoreAsync>();
+            
             services.AddTransient<IUserAsync, UserEfCoreAsync>();
-            services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
+            
+            //services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
+            
             //services.AddTransient<IReportAsync>(s => new ReportDapperAsync(dataConnectionString));
-
+            services.AddTransient<IReportAsync,  ReportDapperAsync>( );
+            
             services.AddScoped<AuthenticationStateProvider, SiteAuthenticationStateProvider>();
+            
             services.AddBlazoredSessionStorage();
 
         }
