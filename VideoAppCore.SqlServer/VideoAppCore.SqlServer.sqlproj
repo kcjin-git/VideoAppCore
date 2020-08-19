@@ -66,6 +66,7 @@
     <Build Include="VOTE_PARTICIPANT.sql" />
     <Build Include="VOTE_CANDIDATE.sql" />
     <Build Include="VOTE_BALLOT.sql" />
+    <Build Include="COMMON_CODES.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VideoAppCore.SqlServer.publish.xml" />

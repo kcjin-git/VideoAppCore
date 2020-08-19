@@ -58,12 +58,13 @@ namespace VideoAppCore
             services.AddTransient<IReportAsync, ReportEfCoreAsync>();
             
             services.AddTransient<IUserAsync, UserEfCoreAsync>();
-            
+
             //services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
-            
+
             //services.AddTransient<IReportAsync>(s => new ReportDapperAsync(dataConnectionString));
-            services.AddTransient<IReportAsync,  ReportDapperAsync>( );
-            
+            services.AddTransient<IReportAsync, ReportDapperAsync>();
+            services.AddTransient<ICommonCodeAsync, CommonCodeDapperAsync>();
+
             services.AddScoped<AuthenticationStateProvider, SiteAuthenticationStateProvider>();
             
             services.AddBlazoredSessionStorage();

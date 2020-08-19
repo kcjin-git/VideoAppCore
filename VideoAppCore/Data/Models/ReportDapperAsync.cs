@@ -26,7 +26,6 @@ namespace VideoAppCore.Data.Models
         {
             const string query =
                 @"INSERT INTO REPORTS (CREATOR, 
-                                       CREATION_DATE, 
                                        API_NAME, 
                                        STRT_DATE, 
                                        END_DATE, 
@@ -34,9 +33,9 @@ namespace VideoAppCore.Data.Models
                                        MODULE_NAME, 
                                        USER_NAME, 
                                        REPORT_TITLE, 
-                                       REPORT_CONTENT) 
+                                       REPORT_CONTENT,
+                                       REPORT_CONTENT_EX) 
                                VALUES (@CREATOR, 
-                                       GetDate(), 
                                        @API_NAME, 
                                        @STRT_DATE, 
                                        @END_DATE,
@@ -44,7 +43,8 @@ namespace VideoAppCore.Data.Models
                                        @MODULE_NAME,
                                        @USER_NAME,
                                        @REPORT_TITLE,
-                                       @REPORT_CONTENT);" +
+                                       @REPORT_CONTENT,
+                                       @REPORT_CONTENT_EX);" +
                 "SELECT Cast(SCOPE_IDENTITY() AS Int);";
 
             int reportId = await db.ExecuteScalarAsync<int>(query, model);
@@ -95,7 +95,8 @@ namespace VideoAppCore.Data.Models
                                           MODULE_NAME    = @MODULE_NAME, 
                                           USER_NAME      = @USER_NAME, 
                                           REPORT_TITLE   = @REPORT_TITLE, 
-                                          REPORT_CONTENT = @REPORT_CONTENT
+                                          REPORT_CONTENT = @REPORT_CONTENT,
+                                          REPORT_CONTENT_EX = @REPORT_CONTENT_EX
                                     WHERE REPORT_ID = @REPORT_ID";
 
             await db.ExecuteAsync(query, model);
@@ -112,21 +113,31 @@ namespace VideoAppCore.Data.Models
             return report;
         }
 
-        public async Task<Report> GetReportsByModuleName(string part_name, DateTime report_date)
+        public async Task<List<Report>> GetReportsByModuleName(string module_name, DateTime report_date)
         {
+            /*
             const string query = @"SELECT DISTINCT STRT_DATE, END_DATE, ORGN_NAME, MODULE_NAME, REPORT_TITLE
-                                        , STUFF((SELECT '<br>' + USER_NAME + REPORT_CONTENT
+                                        , STUFF((SELECT '&lt;p&gt;' + USER_NAME + '&lt;/p&gt;' + REPORT_CONTENT
                                                    FROM REPORTS T1
                                                   WHERE T1.MODULE_NAME = T2.MODULE_NAME
                                                     AND T1.STRT_DATE = T2.STRT_DATE
-                                                    FOR XML PATH('')
+                                                    FOR XML PATH(''), TYPE).Value('.', 'NVARCHAR(MAX)'
                                                 ), 1, 1, '') AS REPORT_CONTENT
+                                        , STUFF((SELECT '&lt;p&gt;' + USER_NAME + '&lt;/p&gt;' + REPORT_CONTENT_EX
+                                                   FROM REPORTS TX
+                                                  WHERE TX.MODULE_NAME = T2.MODULE_NAME
+                                                    AND TX.STRT_DATE = T2.STRT_DATE
+                                                    FOR XML PATH(''), TYPE).Value('.', 'NVARCHAR(MAX)'
+                                                ), 1, 1, '') AS REPORT_CONTENT_EX
                                      FROM REPORTS T2
                                     WHERE MODULE_NAME = @MODULE_NAME AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE ";
+            */
 
-            var report = await db.QueryFirstOrDefaultAsync<Report>(query, new { part_name, report_date }, commandType: CommandType.Text);
+            const string query = "SELECT * FROM REPORTS WHERE MODULE_NAME = @MODULE_NAME AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE ";
 
-            return report;
+            var reports = await db.QueryAsync<Report>(query, new { module_name, report_date }, commandType: CommandType.Text);
+
+            return reports.ToList();
         }
 
 

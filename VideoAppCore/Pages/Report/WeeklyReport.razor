@@ -2,111 +2,289 @@
 
 @using VideoAppCore.Data.Models
 @using System.Globalization
-@inject IReportAsync reportSvc
 @inject IJSRuntime JSRuntime;
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
+@inject IReportAsync reportSvc
+@inject ICommonCodeAsync commonSvc
 
-<div class="row align-content-xl-end" >
-    <button class="btn btn-primary m-2" @onclick="OnSave"> 저 장 </button>
-    <button class="btn btn-primary m-2" @onclick="OnQuery"> 조 회 </button>
-    <button class="btn btn-primary m-2" @onclick="OnClear"> 신 규</button>
-</div>
+@if (module_names == null)
+{
+    <p><em> Loading...</em></p>
+    <div id="floatingCirclesG">
+        <div class="f_circleG" id="frotateG_01"></div>
+        <div class="f_circleG" id="frotateG_02"></div>
+        <div class="f_circleG" id="frotateG_03"></div>
+        <div class="f_circleG" id="frotateG_04"></div>
+        <div class="f_circleG" id="frotateG_05"></div>
+        <div class="f_circleG" id="frotateG_06"></div>
+        <div class="f_circleG" id="frotateG_07"></div>
+        <div class="f_circleG" id="frotateG_08"></div>
+    </div>
+}
+else
+{
+
+    <div class="row align-content-xl-end">
+        <button class="btn btn-primary m-2" @onclick="OnSave"> 저 장 </button>
+        <button class="btn btn-primary m-2" @onclick="OnQuery"> 조 회 </button>
+        <button class="btn btn-primary m-2" @onclick="OnClear"> 신 규</button>
+    </div>
 
     <div class="row">
         <div class="col-xl-6 portfolio-item">
-
-            <ReportComponent StrtDate="@_thisWeekStrtDate" EndDate="@_thisWeekEndDate" EditorId="thisWeek" @ref="thisWeekComp" SaveSucceed="OnSaveCompleted"  />
-
             <!--
+                <ReportComponent StrtDate="@_thisWeekStrtDate" EndDate="@_thisWeekEndDate" EditorId="thisWeek" @ref="thisWeekComp" SaveSucceed="OnSaveCompleted" />
+            -->
             <div class="card h-100">
                 <div class="card-header">
-                    <label class="px-4"> This Week </label>
-                    <input type="date" @bind="thisWeekReport.STRT_DATE" @bind:format="yyyy-MM-dd" />
+                    <label class="px-4"> @ThisWeekTitle </label>
+                    <input type="date" @bind="_thisWeekStrtDate" @bind:format="yyyy-MM-dd" />
                     <label class="px-2"> ~ </label>
-                    <input type="date" @bind="thisWeekReport.END_DATE" @bind:format="yyyy-MM-dd" />
+                    <input type="date" @bind="_thisWeekEndDate" @bind:format="yyyy-MM-dd" />
                 </div>
                 <div class="card-body">
-                    <textarea id="thisWeek" name="editordata"></textarea>
+                    <label>Module</label> &nbsp;
+                    <!--
+                    <input type="text" @bind="ModuleName" />
+                    -->
+                    <select class="dropdown" @bind="ModuleName">
+                        <option class="dropdown-item" value="">-- Select Module --</option>
+                        @foreach (var module in module_names)
+                        {
+                            <option class="dropdown-item" value="@module.CODE_NAME">@module.CODE_NAME</option>
+                        }
+                    </select>
+                    <textarea id="thisWeekEdit" name="editordata" />
                 </div>
             </div>
-                -->
         </div>
 
         <div class="col-xl-6 portfolio-item">
 
-            <ReportComponent StrtDate="@_nextWeekStrtDate" EndDate="@_nextWeekEndDate" EditorId="nextWeek" @ref="nextWeekComp" SaveSucceed="OnSaveCompleted" />
-
             <!--
+                <ReportComponent StrtDate="@_nextWeekStrtDate" EndDate="@_nextWeekEndDate" EditorId="nextWeek" @ref="nextWeekComp" SaveSucceed="OnSaveCompleted" />
+            -->
             <div class="card h-100">
                 <div class="card-header">
-                    <label class="px-4"> Next Week </label>
-                    <input type="date" @bind="nextWeekReport.STRT_DATE" @bind:format="yyyy-MM-dd" />
+                    <label class="px-4"> @NextWeekTitle </label>
+                    <input type="date" @bind="_nextWeekStrtDate" @bind:format="yyyy-MM-dd" />
                     <label class="px-2"> ~ </label>
-                    <input type="date" @bind="nextWeekReport.END_DATE" @bind:format="yyyy-MM-dd" />
+                    <input type="date" @bind="_nextWeekEndDate" @bind:format="yyyy-MM-dd" />
                 </div>
                 <div class="card-body">
-                    <textarea id="nextWeek" name="editordata"></textarea>
+                    <label>Module</label> &nbsp;
+                    <!--
+                        <input type="text" @bind="ModuleName" />
+                    -->
+                    <select class="dropdown" @bind="ModuleName">
+                        <option class="dropdown-item" value="">-- Select Module --</option>
+                        @foreach (var module in module_names)
+                        {
+                            <option class="dropdown-item" value="@module.CODE_NAME">@module.CODE_NAME</option>
+                        }
+                    </select>
+
+                    <textarea id="nextWeekEdit" name="editordata" />
                 </div>
             </div>
-                -->
         </div>
     </div>
+}
 
-    @code {
+@code {
 
-        ReportComponent thisWeekComp, nextWeekComp;
+    Report report;
 
-        private string _thisWeekStrtDate, _thisWeekEndDate;
-        private string _nextWeekStrtDate, _nextWeekEndDate;
-        private int _save_count;
+    /// <summary>
+    /// Editor component
+    /// </summary>
+    //ReportComponent thisWeekComp, nextWeekComp;
+
+    /// <summary>
+    /// ModuleName
+    /// </summary>
+    private List<CommonCode> module_names;
 
 
-        public DateTime getMondayDate(DateTime dt)
+    /// <summary>
+    /// ThisWeek
+    /// </summary>
+    public string ThisWeekTitle { get; set; }
+
+    protected DateTime _thisWeekStrtDate;
+    public string ThisWeekStrtDate { get { return _thisWeekStrtDate.ToString("yyyy-MM-dd"); } set { _thisWeekStrtDate = DateTime.Parse(value); } }
+
+    protected DateTime _thisWeekEndDate;
+    public string ThisWeekEndDate { get { return _thisWeekEndDate.ToString("yyyy-MM-dd"); } set { _thisWeekEndDate = DateTime.Parse(value); } }
+
+    /// <summary>
+    /// NextWeek
+    /// </summary>
+    public string NextWeekTitle { get; set; }
+
+    protected DateTime _nextWeekStrtDate;
+    public string NextWeekStrtDate { get { return _nextWeekStrtDate.ToString("yyyy-MM-dd"); } set { _nextWeekStrtDate = DateTime.Parse(value); } }
+
+    protected DateTime _nextWeekEndDate;
+    public string NextWeekEndDate { get { return _nextWeekEndDate.ToString("yyyy-MM-dd"); } set { _nextWeekEndDate = DateTime.Parse(value); } }
+
+    /// <summary>
+    /// Common
+    /// </summary>
+    private string _module_name;
+    public string ModuleName { get { return _module_name; } set { _module_name = value; } }
+
+    private int _save_count;
+
+
+    public DateTime getMondayDate(DateTime dt)
+    {
+        return dt.AddDays(DayOfWeek.Monday - dt.DayOfWeek);
+    }
+
+    public int GetWeekNumberOfMonth(DateTime date)
+    {
+        date = date.Date;
+        DateTime firstMonthDay = new DateTime(date.Year, date.Month, 1);
+        DateTime firstMonthMonday = firstMonthDay.AddDays((DayOfWeek.Monday + 7 - firstMonthDay.DayOfWeek) % 7);
+        if (firstMonthMonday > date)
         {
-            return dt.AddDays(DayOfWeek.Monday - dt.DayOfWeek);
+            firstMonthDay = firstMonthDay.AddMonths(-1);
+            firstMonthMonday = firstMonthDay.AddDays((DayOfWeek.Monday + 7 - firstMonthDay.DayOfWeek) % 7);
         }
+        return (date - firstMonthMonday).Days / 7 + 1;
+    }
 
 
-        protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        module_names = await GetModuleNameList();
+
+        _thisWeekStrtDate = this.getMondayDate(DateTime.Today);
+        _thisWeekEndDate = _thisWeekStrtDate.AddDays(6);
+        _nextWeekStrtDate = _thisWeekStrtDate.AddDays(7);
+        _nextWeekEndDate = _nextWeekStrtDate.AddDays(6);
+
+        ThisWeekTitle = _thisWeekStrtDate.ToString("MM") + "월 " + GetWeekNumberOfMonth(_thisWeekStrtDate).ToString() + "주";
+        NextWeekTitle = _nextWeekStrtDate.ToString("MM") + "월 " + GetWeekNumberOfMonth(_nextWeekStrtDate).ToString() + "주";
+
+        await JSRuntime.InvokeVoidAsync("addEventListener", "thisWeekEdit");
+        await JSRuntime.InvokeVoidAsync("addEventListener", "nextWeekEdit");
+
+        await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", "");
+        await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", "");
+
+        ModuleName = "";
+
+        await OnQuery();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+
+        if (report != null)
         {
-            _thisWeekStrtDate = this.getMondayDate(DateTime.Today).ToString("yyyy-MM-dd");
-            _thisWeekEndDate = this.getMondayDate(DateTime.Today).AddDays(6).ToString("yyyy-MM-dd");
-            _nextWeekStrtDate = this.getMondayDate(DateTime.Today).AddDays(7).ToString("yyyy-MM-dd");
-            _nextWeekEndDate = this.getMondayDate(DateTime.Today).AddDays(13).ToString("yyyy-MM-dd");
+            await JSRuntime.InvokeVoidAsync("addEventListener", "thisWeekEdit");
+            await JSRuntime.InvokeVoidAsync("addEventListener", "nextWeekEdit");
 
-            return base.OnInitializedAsync();
-        }
-
-        protected async Task OnSave()
-        {
-            _save_count = 0;
-
-            await thisWeekComp.Save();
-            await nextWeekComp.Save();
-        }
-
-        protected async Task OnQuery()
-        {
-            await thisWeekComp.Query(0, _thisWeekStrtDate);
-            await nextWeekComp.Query(0, _nextWeekStrtDate);
-        }
-
-        protected async Task OnClear()
-        {
-            await thisWeekComp.Clear(_thisWeekStrtDate, _thisWeekEndDate);
-            await nextWeekComp.Clear(_nextWeekStrtDate, _nextWeekEndDate);
-        }
-
-
-        public void OnSaveCompleted(Report report)
-        {
-            _save_count++;
-
-            if(_save_count >= 2)
-            {
-                JSRuntime.InvokeVoidAsync("alert", "save succeed...");
-            }
+            await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", report.REPORT_CONTENT);
+            await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", report.REPORT_CONTENT_EX);
         }
     }
+
+    protected async Task<List<CommonCode>> GetModuleNameList()
+    {
+        return await commonSvc.GetCommonCodeListAsync("ORG001_MDL");
+    }
+
+    public async void OnModuleNameClicked(ChangeEventArgs moduleEvent)
+    {
+        string module_code = moduleEvent.Value.ToString();
+        string module_name = module_names.FirstOrDefault(s => s.CODE == module_code).CODE_NAME;
+
+        await JSRuntime.InvokeVoidAsync("alert", "[" + module_code + "]" + module_name);
+    }
+
+    protected async Task OnClear()
+    {
+        await OnInitializedAsync();
+
+        if (report != null)
+        {
+            report = null;
+            report = new Report(_thisWeekStrtDate);
+        }
+
+        StateHasChanged();
+    }
+
+
+    protected async Task OnSave()
+    {
+        if (report.REPORT_ID > 0)
+        {
+            report.MODIFIER = await sessionStorage.GetItemAsync<string>("EMailAddr");
+        }
+        else
+        {
+            report.CREATOR = await sessionStorage.GetItemAsync<string>("EMailAddr");
+            report.ORGN_NAME = await sessionStorage.GetItemAsync<string>("OrgnName");
+            report.USER_NAME = await sessionStorage.GetItemAsync<string>("UserName");
+        }
+
+        report.MODULE_NAME = _module_name;
+        report.STRT_DATE = _thisWeekStrtDate;
+        report.END_DATE = _thisWeekEndDate;
+
+        report.REPORT_CONTENT = await JSRuntime.InvokeAsync<string>("getData", "thisWeekEdit");
+        report.REPORT_CONTENT_EX = await JSRuntime.InvokeAsync<string>("getData", "nextWeekEdit");
+
+        if (report.REPORT_ID > 0)
+            report = await reportSvc.UpdateReportAsync(report);
+        else
+            report = await reportSvc.AddReportAsync(report);
+
+        await JSRuntime.InvokeVoidAsync("alert", "save succeed...");
+
+        await OnQuery();
+    }
+
+    public async Task OnQuery()
+    {
+        string sUser = await sessionStorage.GetItemAsync<string>("EMailAddr");
+
+        if (report != null && report.REPORT_ID > 0)
+            report = await reportSvc.GetReportByIdAsync(report.REPORT_ID);
+        else
+            report = await reportSvc.GetReportByDate(sUser, _thisWeekStrtDate);
+
+        if (report != null)
+        {
+            _module_name = report.MODULE_NAME;
+
+            _thisWeekStrtDate = report.STRT_DATE;
+            _thisWeekEndDate = report.END_DATE;
+
+            _nextWeekStrtDate = _thisWeekStrtDate.AddDays(7);
+            _nextWeekEndDate = _thisWeekEndDate.AddDays(7);
+
+            await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", report.REPORT_CONTENT);
+            await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", report.REPORT_CONTENT_EX);
+        }
+        else
+        {
+            report = new Report(_thisWeekStrtDate);
+
+            await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", "");
+            await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", "");
+        }
+
+        StateHasChanged();
+    }
+}
 

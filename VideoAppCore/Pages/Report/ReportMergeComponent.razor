@@ -162,8 +162,9 @@
         report.STRT_DATE = _strt_date;
         report.END_DATE = _end_date;
         report.REPORT_CONTENT = await JSRuntime.InvokeAsync<string>("getData", EditorId);
+        report.REPORT_CONTENT_EX = await JSRuntime.InvokeAsync<string>("getData", EditorId);
 
-        if(report.REPORT_ID > 0)
+        if (report.REPORT_ID > 0)
             report = await reportSvc.UpdateReportAsync(report);
         else
             report = await reportSvc.AddReportAsync(report);

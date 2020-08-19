@@ -19,6 +19,7 @@ namespace VideoAppCore.Data.Models
      
         public string REPORT_TITLE { get; set; }
         public string REPORT_CONTENT { get; set; }
+        public string REPORT_CONTENT_EX { get; set; }
 
         public Report()
         {

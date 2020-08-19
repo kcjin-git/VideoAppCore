@@ -1,8 +1,76 @@
 ﻿
 @page "/Videos/Create"
 
+@inject IJSRuntime JSRuntime;
+
 <h3>Create</h3>
 
+
+<button type="button" @onclick="test">  btn </button>
+
 @code {
+
+    protected void test()
+    {
+        string ev = "";
+        foreach(string s in e)
+        {
+            ev += " -> " + s;
+        }
+
+        JSRuntime.InvokeVoidAsync("alert", ev);
+
+        StateHasChanged();
+    }
+
+    List<string> e = new List<string>();
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        e.Add("OnAfterRender");
+        base.OnAfterRender(firstRender);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        e.Add("OnAfterRenderAsync");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        e.Add("OnInitialized");
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        e.Add("OnInitializedAsync");
+
+        return base.OnInitializedAsync();
+    }
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        e.Add("OnParametersSet");
+
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        e.Add("OnParametersSetAsync");
+
+        return base.OnParametersSetAsync();
+    }
+
+
+    protected override bool ShouldRender()
+    {
+        e.Add("OnParametersSetAsync");
+        return base.ShouldRender();
+    }
 
 }

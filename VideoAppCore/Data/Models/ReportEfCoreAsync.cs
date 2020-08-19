@@ -71,7 +71,7 @@ namespace VideoAppCore.Data.Models
 
             return await _context.Reports.FromSqlRaw<Report>(query, workDate).FirstOrDefaultAsync();
         }
-        public async Task<Report> GetReportsByModuleName(string orgn_name, DateTime report_date)
+        public async Task <List<Report>> GetReportsByModuleName(string orgn_name, DateTime report_date)
         {
             return null;
         }
