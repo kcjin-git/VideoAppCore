@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Models\ReportEfCoreAsync.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\table\js\main.js" />
     <None Include="wwwroot\css\table\perfect-scrollbar\perfect-scrollbar.min.js" />
     <None Include="wwwroot\css\table\select2\select2.js" />

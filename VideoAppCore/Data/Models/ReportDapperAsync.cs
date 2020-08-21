@@ -29,6 +29,7 @@ namespace VideoAppCore.Data.Models
                                        API_NAME, 
                                        STRT_DATE, 
                                        END_DATE, 
+                                       REPORT_TYPE,
                                        ORGN_NAME, 
                                        MODULE_NAME, 
                                        USER_NAME, 
@@ -39,6 +40,7 @@ namespace VideoAppCore.Data.Models
                                        @API_NAME, 
                                        @STRT_DATE, 
                                        @END_DATE,
+                                       @REPORT_TYPE,
                                        @ORGN_NAME,
                                        @MODULE_NAME,
                                        @USER_NAME,
@@ -47,6 +49,7 @@ namespace VideoAppCore.Data.Models
                                        @REPORT_CONTENT_EX);" +
                 "SELECT Cast(SCOPE_IDENTITY() AS Int);";
 
+            model.API_NAME = "ReportDapperAsync::AddReportAsync";
             int reportId = await db.ExecuteScalarAsync<int>(query, model);
 
             model.REPORT_ID = reportId;
@@ -56,7 +59,7 @@ namespace VideoAppCore.Data.Models
 
         public async Task<Report> GetReportByIdAsync(int reprotId)
         {
-            const string query = "SELECT * FROM REPORTS WHERE REPORT_ID = @REPORT_ID";
+            const string query = "SELECT * FROM REPORTS WHERE REPORT_ID = @REPORT_ID AND EXPR_DATE > GetDate()";
 
             Report report = new Report();
             report.REPORT_ID = reprotId;
@@ -69,22 +72,29 @@ namespace VideoAppCore.Data.Models
 
         public async Task<List<Report>> GetReportListAsync()
         {
-            const string query = "SELECT * FROM REPORTS;";
+            const string query = "SELECT * FROM REPORTS ;";
 
             var reports = await db.QueryAsync<Report>(query);
 
             return reports.ToList();
         }
 
-        public async Task RemoveReportAsync(int reportId)
+        public async Task<int> RemoveReportAsync(int report_id, string email)
         {
-            throw new System.NotImplementedException();
+            const string query = @"UPDATE REPORTS
+                                      SET API_NAME       = 'ReportDapperAsync::RemoveReportAsync', 
+                                          MODIFIER       = @EMAIL,
+                                          MODIFICATION_DATE = GetDate(),
+                                          EXPR_DATE = GetDate()
+                                    WHERE REPORT_ID = @REPORT_ID
+                                      AND EXPR_DATE > GetDate() ";
+
+            int nAffected = await db.ExecuteAsync(query, new {report_id, email});
+            return nAffected;
         }
 
         public async Task<Report> UpdateReportAsync(Report model)
         {            
-           
-
             const string query = @"UPDATE REPORTS
                                       SET API_NAME       = 'ReportDapperAsync::UpdateReportAsync', 
                                           MODIFIER       = @MODIFIER,
@@ -106,14 +116,61 @@ namespace VideoAppCore.Data.Models
 
         public async Task<Report> GetReportByDate(string eMail, DateTime report_date)
         {
-            const string query = "SELECT * FROM REPORTS WHERE CREATOR = @EMAIL AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE";
+            const string query = @"SELECT * 
+                                     FROM REPORTS 
+                                    WHERE CREATOR = @EMAIL 
+                                      AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE 
+                                      AND REPORT_TYPE = 'P' 
+                                      AND EXPR_DATE > GetDate() ";
 
             var report = await db.QueryFirstOrDefaultAsync<Report>(query, new {eMail, report_date }, commandType: CommandType.Text);
 
             return report;
         }
 
-        public async Task<List<Report>> GetReportsByModuleName(string module_name, DateTime report_date)
+        public async Task<Report> GetReportByOwner(string report_type, string report_owner, DateTime report_date)
+        {
+            string query = @"SELECT * 
+                               FROM REPORTS 
+                              WHERE CREATOR = @REPORT_OWNER 
+                                AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE 
+                                AND REPORT_TYPE = 'P' 
+                                AND EXPR_DATE > GetDate() ";
+
+            if(report_type == "M")
+            {
+                query = @"SELECT * 
+                            FROM REPORTS 
+                           WHERE MODULE_NAME = @REPORT_OWNER 
+                             AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE 
+                             AND REPORT_TYPE = 'M'  
+                             AND EXPR_DATE > GetDate() ";
+            }
+
+            if (report_type == "T")
+            {
+                query = @"SELECT * 
+                            FROM REPORTS 
+                           WHERE ORGN_NAME = @REPORT_OWNER 
+                             AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE 
+                             AND REPORT_TYPE = 'T'  
+                             AND EXPR_DATE > GetDate() ";
+            }
+
+            var report = await db.QueryFirstOrDefaultAsync<Report>(query, new { report_owner, report_date }, commandType: CommandType.Text);
+
+            return report;
+        }
+
+        /// <summary>
+        /// MODULE_NAME에 해당하는 개인('P')의 REPORT 조회
+        /// ORGN_NAME에 해당하는 모듈('M')의 REPORT조회
+        /// </summary>
+        /// <param name="report_type">M : 모듈 OR T :팀</param>
+        /// <param name="report_name">모듈명 OR 팀명</param>
+        /// <param name="report_date">소속일자</param>
+        /// <returns></returns>
+        public async Task<List<Report>> GetReportListByOwner(string report_type, string report_name, DateTime report_date)
         {
             /*
             const string query = @"SELECT DISTINCT STRT_DATE, END_DATE, ORGN_NAME, MODULE_NAME, REPORT_TITLE
@@ -132,10 +189,25 @@ namespace VideoAppCore.Data.Models
                                      FROM REPORTS T2
                                     WHERE MODULE_NAME = @MODULE_NAME AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE ";
             */
+            //개인 주간보고
+            string query = @"SELECT * 
+                               FROM REPORTS 
+                              WHERE MODULE_NAME = @REPORT_NAME 
+                                AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE 
+                                AND REPORT_TYPE = 'P' 
+                                AND EXPR_DATE > GetDate() ";
 
-            const string query = "SELECT * FROM REPORTS WHERE MODULE_NAME = @MODULE_NAME AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE ";
+            if (report_type == "T") //Module
+            {
+                query = "SELECT * " +
+                        "  FROM REPORTS " +
+                        " WHERE ORGN_NAME = @REPORT_NAME " +
+                        "   AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE " +
+                        "   AND REPORT_TYPE = 'M' " +
+                        "   AND EXPR_DATE > GetDate() ";
+            }
 
-            var reports = await db.QueryAsync<Report>(query, new { module_name, report_date }, commandType: CommandType.Text);
+            var reports = await db.QueryAsync<Report>(query, new { report_name, report_date}, commandType: CommandType.Text);
 
             return reports.ToList();
         }
@@ -143,7 +215,12 @@ namespace VideoAppCore.Data.Models
 
         public async Task<List<Report>> GetReportsByOrgnName(string orgn_name, DateTime report_date)
         {
-            const string query = "SELECT * FROM REPORTS WHERE ORGN_NAME = @ORGN_NAME AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE ORDER BY PART_NAME";
+            const string query = @"SELECT * 
+                                     FROM REPORTS 
+                                    WHERE ORGN_NAME = @ORGN_NAME 
+                                      AND @REPORT_DATE BETWEEN STRT_DATE AND END_DATE 
+                                      AND EXPR_DATE > GetDate()
+                                 ORDER BY PART_NAME";
 
             var reports = await db.QueryAsync<Report>(query, new { orgn_name, report_date }, commandType: CommandType.Text);
 

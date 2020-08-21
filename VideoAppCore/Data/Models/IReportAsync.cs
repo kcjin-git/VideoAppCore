@@ -10,9 +10,12 @@ namespace VideoAppCore.Data.Models
         Task<List<Report>> GetReportListAsync();
         Task<Report> GetReportByIdAsync(int reprotId);
         Task<Report> UpdateReportAsync(Report model);
-        Task RemoveReportAsync(int reportId);
+        Task<int> RemoveReportAsync(int reportId, string email);
 
         Task<Report> GetReportByDate(string sUser, DateTime workDate);
-        Task<List<Report>> GetReportsByModuleName(string part_name, DateTime report_date);
+        Task<List<Report>> GetReportListByOwner(string report_type, string report_owner, DateTime report_date);
+
+        Task<Report> GetReportByOwner(string report_type, string report_owner, DateTime report_date);
+
     }
 }

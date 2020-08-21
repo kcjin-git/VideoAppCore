@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
+    <ToastComponent />
+
     <AuthorizeView>
         <Authorized>
             <div class="container-fluid">
@@ -15,11 +17,11 @@
                         @Body
                     </div>
                 </div>
-            </div>          
+            </div>
         </Authorized>
 
         <NotAuthorized>
-            <VideoAppCore.Pages.Login.Login/>
+            <VideoAppCore.Pages.Login.Login />
         </NotAuthorized>
 
     </AuthorizeView>

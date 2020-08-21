@@ -1,4 +1,4 @@
-﻿@page "/Report/WeeklyReportPart"
+﻿@page "/Report/WeeklyReportModule"
 
 @using VideoAppCore.Data.Models
 @using System.Globalization
@@ -10,7 +10,7 @@
 @inject IReportAsync reportSvc
 @inject ICommonCodeAsync commonSvc
 
-@if (module_names == null)
+@if (_module_names == null)
 {
     <p><em> Loading...</em></p>
     <div id="floatingCirclesG">
@@ -27,10 +27,11 @@
 else
 {
 
-    <div class="row align-content-xl-end">
-        <button class="btn btn-primary m-2" @onclick="OnSave"> 저 장 </button>
-        <button class="btn btn-primary m-2" @onclick="OnQuery"> 조 회 </button>
-        <button class="btn btn-primary m-2" @onclick="OnClear"> 신 규</button>
+    <div class="row align-content-xl-end m-3">
+        <button class="btn btn-primary m-1" @onclick="OnClear"> 신 규 </button>
+        <button class="btn btn-primary m-1" @onclick="OnQuery"> 조 회 </button>
+        <button class="btn btn-primary m-1" @onclick="OnSave"> 저 장 </button>
+        <button class="btn btn-primary m-1" @onclick="OnRemove"> 삭 제 </button>
     </div>
 
     <div class="row">
@@ -47,12 +48,9 @@ else
                 </div>
                 <div class="card-body">
                     <label>Module</label> &nbsp;
-                    <!--
-    <input type="text" @bind="ModuleName" />
-    -->
                     <select class="dropdown" @onchange="OnModuleNameClicked">
                         <option class="dropdown-item" value="">-- Select Module --</option>
-                        @foreach (var module in module_names)
+                        @foreach (var module in _module_names)
                         {
                             <option class="dropdown-item" value="@module.CODE_NAME">@module.CODE_NAME</option>
                         }
@@ -75,7 +73,7 @@ else
                     <input type="date" @bind="_nextWeekEndDate" @bind:format="yyyy-MM-dd" />
                 </div>
                 <div class="card-body">
-                    <label>Module : @ModuleName</label>  
+                    <label>Module : @ModuleName</label>
 
                     <textarea id="nextWeekEdit" name="editordata" />
                 </div>
@@ -83,6 +81,9 @@ else
         </div>
     </div>
 }
+
+<ConfirmModal  @ref="confirmModal" Title="@ConfirmTitle" Message="@ConfirmMessage" OnConfirmCallback="OnRemoveConfirm" />
+<AlertModal @ref="alertModal" Title="@ConfirmTitle" Message="@ConfirmMessage" />
 
 @code {
 
@@ -96,7 +97,7 @@ else
     /// <summary>
     /// ModuleName
     /// </summary>
-    private List<CommonCode> module_names;
+    private List<CommonCode> _module_names;
 
 
     /// <summary>
@@ -148,12 +149,8 @@ else
         return (date - firstMonthMonday).Days / 7 + 1;
     }
 
-
-
-    protected override async Task OnInitializedAsync()
+    protected void SetDefault()
     {
-        module_names = await GetModuleNameList();
-
         _thisWeekStrtDate = this.getMondayDate(DateTime.Today);
         _thisWeekEndDate = _thisWeekStrtDate.AddDays(6);
         _nextWeekStrtDate = _thisWeekStrtDate.AddDays(7);
@@ -162,15 +159,20 @@ else
         ThisWeekTitle = _thisWeekStrtDate.ToString("MM") + "월 " + GetWeekNumberOfMonth(_thisWeekStrtDate).ToString() + "주";
         NextWeekTitle = _nextWeekStrtDate.ToString("MM") + "월 " + GetWeekNumberOfMonth(_nextWeekStrtDate).ToString() + "주";
 
-        await JSRuntime.InvokeVoidAsync("addEventListener", "thisWeekEdit");
-        await JSRuntime.InvokeVoidAsync("addEventListener", "nextWeekEdit");
+        JSRuntime.InvokeVoidAsync("addEventListener", "thisWeekEdit");
+        JSRuntime.InvokeVoidAsync("addEventListener", "nextWeekEdit");
 
-        await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", "");
-        await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", "");
+        JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", "");
+        JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", "");
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _module_names = await GetModuleNameList();
 
         ModuleName = "";
-
-        //await OnQuery();
+        SetDefault();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -206,7 +208,7 @@ else
 
     protected async Task OnClear()
     {
-        await OnInitializedAsync();
+        SetDefault();
 
         if (report != null)
         {
@@ -231,6 +233,7 @@ else
             report.USER_NAME = await sessionStorage.GetItemAsync<string>("UserName");
         }
 
+        report.REPORT_TYPE = "M";
         report.MODULE_NAME = _module_name;
         report.STRT_DATE = _thisWeekStrtDate;
         report.END_DATE = _thisWeekEndDate;
@@ -243,36 +246,48 @@ else
         else
             report = await reportSvc.AddReportAsync(report);
 
-        await JSRuntime.InvokeVoidAsync("alert", "save succeed...");
+        //await JSRuntime.InvokeVoidAsync("alert", "save succeed...");
+        ShowMessage("저장", "ReportID[" + report.REPORT_ID.ToString() + "]으로 저장되었습니다.");
 
         await OnQuery();
     }
 
     public async Task OnQuery()
     {
-        report = null;
-
-        string sUser = await sessionStorage.GetItemAsync<string>("EMailAddr");
 
         if (report != null && report.REPORT_ID > 0)
             report = await reportSvc.GetReportByIdAsync(report.REPORT_ID);
         else
         {
-            List<Report> report_list = await reportSvc.GetReportsByModuleName(ModuleName, _thisWeekStrtDate);
-
-            if(report_list != null && report_list.Count > 0)
+            if(ModuleName == "")
             {
-                report = new Report();
-                foreach (Report rpt in report_list)
+                ShowMessage("조회", "모듈명을 선택하세요");
+                return;
+            }
+
+            report = await reportSvc.GetReportByOwner("M", ModuleName, _thisWeekStrtDate);
+            if (report == null)
+            {
+                List<Report> report_list = await reportSvc.GetReportListByOwner("M", ModuleName, _thisWeekStrtDate);
+                string sUser = await sessionStorage.GetItemAsync<string>("EMailAddr");
+
+                if (report_list != null && report_list.Count > 0)
                 {
-                    report.END_DATE = rpt.END_DATE;
-                    report.MODULE_NAME = rpt.MODULE_NAME;
-                    report.ORGN_NAME = rpt.ORGN_NAME;
-                    report.REPORT_CONTENT += "<p>[" + rpt.USER_NAME + "] </p>" + rpt.REPORT_CONTENT;
-                    report.REPORT_CONTENT_EX = "<p>[" + rpt.USER_NAME + "] </p>" + rpt.REPORT_CONTENT_EX;
-                    report.REPORT_TITLE = rpt.REPORT_TITLE;
-                    report.STRT_DATE = rpt.STRT_DATE;
-                    report.USER_NAME = sUser;
+                    report = new Report();
+                    report.REPORT_TYPE = "M";
+                    foreach (Report rpt in report_list)
+                    {
+                        report.END_DATE = rpt.END_DATE;
+                        report.MODULE_NAME = rpt.MODULE_NAME;
+                        report.ORGN_NAME = rpt.ORGN_NAME;
+                        report.REPORT_CONTENT += "<p>[" + rpt.USER_NAME + "] </p>" + rpt.REPORT_CONTENT;
+                        report.REPORT_CONTENT_EX = "<p>[" + rpt.USER_NAME + "] </p>" + rpt.REPORT_CONTENT_EX;
+                        report.REPORT_TITLE = rpt.REPORT_TITLE;
+                        report.STRT_DATE = rpt.STRT_DATE;
+                        report.USER_NAME = sUser;
+                    }
+
+                    ShowMessage("보고서 생성", "작성된 모듈 보고서가 없어 개인별 보고서로 모듈 보고서를 생성하였습니다.");
                 }
             }
         }
@@ -292,10 +307,59 @@ else
         }
         else
         {
+            ShowMessage("Info", "작성된 모듈 보고서 및 개인별 보고서가 없습니다.");
+
             report = new Report(_thisWeekStrtDate);
         }
 
         StateHasChanged();
     }
-}
 
+    AlertModal alertModal;
+    ConfirmModal confirmModal;
+
+    public string ConfirmTitle { get; set; }
+    public string ConfirmMessage { get; set; }
+
+    protected async Task OnRemove()
+    {
+        if (report != null && report.REPORT_ID > 0)
+        {
+            ConfirmTitle = "삭제";
+            ConfirmMessage = "작성중인 보고서를 삭제하시겠습니까?";
+
+            confirmModal.ModalShow();
+            // -> Callback : OnConfirm() 
+
+            return;
+        }
+
+        //await JSRuntime.InvokeVoidAsync("alert", "삭제 대상 ReportID [" + report.REPORT_ID.ToString() + "]가 존재 하지 않습니다.");
+        ShowMessage("삭제오류", "삭제 대상 ReportID[" + report.REPORT_ID.ToString() + "]가 존재 하지 않습니다.");
+    }
+
+
+    protected async Task OnRemoveConfirm(bool bAction)
+    {
+        if(bAction)
+        {
+            string sUser = await sessionStorage.GetItemAsync<string>("EMailAddr");
+            int nAffected = await reportSvc.RemoveReportAsync(report.REPORT_ID, sUser);
+            if (nAffected >= 1)
+            {
+                //await JSRuntime.InvokeVoidAsync("alert", nAffected.ToString() + "개의 레코드가 삭제되었습니다.");
+                ShowMessage("삭제", nAffected.ToString() + "개의 레코드가 삭제되었습니다.");
+                await OnClear();
+            }
+        }
+    }
+
+    protected void ShowMessage(string sTitle, string sMessage)
+    {
+        ConfirmTitle = sTitle;
+        ConfirmMessage = sMessage;
+
+        alertModal.ModalShow();
+    }
+
+}

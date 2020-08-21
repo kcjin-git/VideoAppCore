@@ -1,0 +1,57 @@
+﻿
+
+@if (showModal)
+{
+    <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">@Title</h4>
+                    <button type="button" class="close" @onclick="@OnCancel">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <p>@Message</p>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn" @onclick="@OnCancel">취소</button>
+                    <button type="button" class="btn btn-danger" @onclick="@OnConfirm">확인</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    protected bool showModal = false;
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnConfirmCallback { get; set; }
+
+
+    public void ModalShow() => showModal = true;
+    protected void OnCancel()
+    {
+        showModal = false;
+        
+        OnConfirmCallback.InvokeAsync(false);
+    }
+
+    protected void OnConfirm()
+    {
+        showModal = false;
+        OnConfirmCallback.InvokeAsync(true);
+    }
+}

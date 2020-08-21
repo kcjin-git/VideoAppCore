@@ -55,7 +55,7 @@ namespace VideoAppCore
             string dataConnectionString = Configuration.GetConnectionString("DefaultConnection");
 
             //DI Container에 서비스 등록
-            services.AddTransient<IReportAsync, ReportEfCoreAsync>();
+            //services.AddTransient<IReportAsync, ReportEfCoreAsync>();
             
             services.AddTransient<IUserAsync, UserEfCoreAsync>();
 
@@ -68,6 +68,8 @@ namespace VideoAppCore
             services.AddScoped<AuthenticationStateProvider, SiteAuthenticationStateProvider>();
             
             services.AddBlazoredSessionStorage();
+
+            services.AddScoped<ToastService>();
 
         }
 
