@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Comm
 {
     public interface ICommonCodeAsync 
     {

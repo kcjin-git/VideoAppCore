@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     public interface IVideoRepositoryASync
     {

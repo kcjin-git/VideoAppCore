@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Comm
 {
     public class ControlField
     {

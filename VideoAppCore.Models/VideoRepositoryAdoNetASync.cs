@@ -4,7 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     /// <summary>
     /// [4][1][2] Ado.net을 이용한 ASync CRUD

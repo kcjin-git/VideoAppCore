@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     /// <summary>
     /// [4][3][2] EfCore를 이용한 ASync CRUD

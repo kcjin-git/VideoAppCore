@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     public class AuditableBase
     {

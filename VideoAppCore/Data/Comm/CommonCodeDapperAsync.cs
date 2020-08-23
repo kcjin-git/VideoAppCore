@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Comm
 {
     public class CommonCodeDapperAsync : ICommonCodeAsync
     {

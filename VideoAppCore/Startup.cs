@@ -13,14 +13,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using VideoAppCore.Areas.Identity;
-using VideoAppCore.Data;
-using VideoAppCore.Models;
-using VideoAppCore.Data.Models;
+using TeamWork.Areas.Identity;
+using TeamWork.Data;
+using TeamWork.Models;
+using TeamWork.Data.Rpt;
+using TeamWork.Data.Usr;
+using TeamWork.Data.Comm;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Blazored.SessionStorage;
 
-namespace VideoAppCore
+namespace TeamWork
 {
     public class Startup
     {

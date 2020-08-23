@@ -1,6 +1,8 @@
 ﻿@page "/Report/WeeklyReport"
 
-@using VideoAppCore.Data.Models
+@using TeamWork.Data.Rpt
+@using TeamWork.Data.Comm
+
 @using System.Globalization
 @inject IJSRuntime JSRuntime;
 
@@ -28,9 +30,9 @@ else
 {
 
     <div class="row align-content-xl-end m-3">
-        <button class="btn btn-primary m-1" @onclick="OnSave"> 저 장 </button>
-        <button class="btn btn-primary m-1" @onclick="OnQuery"> 조 회 </button>
         <button class="btn btn-primary m-1" @onclick="OnClear"> 신 규</button>
+        <button class="btn btn-primary m-1" @onclick="OnQuery"> 조 회 </button>
+        <button class="btn btn-primary m-1" @onclick="OnSave"> 저 장 </button>
     </div>
 
     <div class="row">
@@ -93,6 +95,14 @@ else
         </div>
     </div>
 }
+
+<!--
+    <ConfirmModal @ref="confirmModal" Title="@ConfirmTitle" Message="@ConfirmMessage" OnConfirmCallback="OnRemoveConfirm" />
+-->
+
+<AlertModal @ref="alertModal" Title="@ConfirmTitle" Message="@ConfirmMessage" />
+
+
 
 @code {
 
@@ -208,6 +218,8 @@ else
         string module_name = module_names.FirstOrDefault(s => s.CODE == module_code).CODE_NAME;
 
         await JSRuntime.InvokeVoidAsync("alert", "[" + module_code + "]" + module_name);
+
+
     }
 
     protected async Task OnClear()
@@ -250,8 +262,10 @@ else
         else
             report = await reportSvc.AddReportAsync(report);
 
-        await JSRuntime.InvokeVoidAsync("alert", "save succeed...");
 
+        ShowMessage("저장", "ReportID [" + report.REPORT_ID.ToString() + "]로 저장 되었습니다.");
+
+        //await JSRuntime.InvokeVoidAsync("alert", "save succeed...");
         //toastService.ShowToast("저장 되었습니다.", ToastLevel.Info);
 
         await OnQuery();
@@ -278,16 +292,41 @@ else
 
             await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", report.REPORT_CONTENT);
             await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", report.REPORT_CONTENT_EX);
-        }
-        else
-        {
-            report = new Report(_thisWeekStrtDate);
 
-            await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", "");
-            await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", "");
+            return;
         }
+
+        //등록된 보고서가 없으면 신규 보고서를 만듬, 전주 보고서가 있으면 전주의 차주할일을 금주할일로 기본 설정.
+        report = new Report(_thisWeekStrtDate);
+
+        Report prev_rpt = await reportSvc.GetReportByDate(sUser, _thisWeekStrtDate.AddDays(-7));
+        if(prev_rpt != null)
+        {
+            report.REPORT_CONTENT = prev_rpt.REPORT_CONTENT_EX;
+            report.REPORT_CONTENT_EX = "";
+
+            ShowMessage("보고서 생성", "금주 생성된 보고서가 없어 지난주 보고서를 이용하여 금주보고서를 생성하였습니다.");
+        }
+
+        await JSRuntime.InvokeAsync<string>("setData", "thisWeekEdit", report.REPORT_CONTENT);
+        await JSRuntime.InvokeAsync<string>("setData", "nextWeekEdit", report.REPORT_CONTENT_EX);
 
         StateHasChanged();
     }
+
+    AlertModal alertModal;
+    ConfirmModal confirmModal;
+
+    public string ConfirmTitle { get; set; }
+    public string ConfirmMessage { get; set; }
+
+    protected void ShowMessage(string sTitle, string sMessage)
+    {
+        ConfirmTitle = sTitle;
+        ConfirmMessage = sMessage;
+
+        alertModal.ModalShow();
+    }
+
 }
 

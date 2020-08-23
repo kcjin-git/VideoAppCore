@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Rpt
 {
     public interface IReportAsync
     {

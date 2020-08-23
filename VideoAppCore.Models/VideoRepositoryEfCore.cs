@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     /// <summary>
     /// [4][3][1] EfCore를 이용한 CRUD

@@ -1,6 +1,6 @@
 using System;
 
-namespace VideoAppCore.Data
+namespace TeamWork.Data
 {
     public class WeatherForecast
     {

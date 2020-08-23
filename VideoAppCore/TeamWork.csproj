@@ -6,12 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Vote\**" />
     <Compile Remove="wwwroot\css\bootstrap\**" />
     <Compile Remove="wwwroot\css\open-iconic\**" />
+    <Content Remove="Data\Vote\**" />
     <Content Remove="wwwroot\css\bootstrap\**" />
     <Content Remove="wwwroot\css\open-iconic\**" />
+    <EmbeddedResource Remove="Data\Vote\**" />
     <EmbeddedResource Remove="wwwroot\css\bootstrap\**" />
     <EmbeddedResource Remove="wwwroot\css\open-iconic\**" />
+    <None Remove="Data\Vote\**" />
     <None Remove="wwwroot\css\bootstrap\**" />
     <None Remove="wwwroot\css\open-iconic\**" />
   </ItemGroup>
@@ -38,7 +42,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VideoAppCore.Models\VideoAppCore.Models.csproj" />
-    <ProjectReference Include="..\VideoAppCore.SqlServer\VideoAppCore.SqlServer.sqlproj" />
+    <ProjectReference Include="..\VideoAppCore.SqlServer\TeamWork.SqlServer.sqlproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\Vote\" />
   </ItemGroup>
 
 </Project>

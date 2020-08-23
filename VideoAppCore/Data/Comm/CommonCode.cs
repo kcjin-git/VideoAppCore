@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Comm
 {
     public class CommonCode : ControlField
     {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using VideoAppCore.Data.Models;
+using TeamWork.Data.Comm;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Rpt
 {
     public class Report : ControlField
     {

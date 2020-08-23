@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     public class VideoDBContext : DbContext
     {

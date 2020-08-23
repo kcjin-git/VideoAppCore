@@ -1,6 +1,8 @@
 ﻿@page "/Report/WeeklyReportModule"
 
-@using VideoAppCore.Data.Models
+@using TeamWork.Data.Rpt
+@using TeamWork.Data.Comm
+
 @using System.Globalization
 @inject IJSRuntime JSRuntime;
 
@@ -82,7 +84,7 @@ else
     </div>
 }
 
-<ConfirmModal  @ref="confirmModal" Title="@ConfirmTitle" Message="@ConfirmMessage" OnConfirmCallback="OnRemoveConfirm" />
+<ConfirmModal @ref="confirmModal" Title="@ConfirmTitle" Message="@ConfirmMessage" OnConfirmCallback="OnRemoveConfirm" />
 <AlertModal @ref="alertModal" Title="@ConfirmTitle" Message="@ConfirmMessage" />
 
 @code {
@@ -259,7 +261,7 @@ else
             report = await reportSvc.GetReportByIdAsync(report.REPORT_ID);
         else
         {
-            if(ModuleName == "")
+            if (ModuleName == "")
             {
                 ShowMessage("조회", "모듈명을 선택하세요");
                 return;
@@ -329,7 +331,7 @@ else
             ConfirmMessage = "작성중인 보고서를 삭제하시겠습니까?";
 
             confirmModal.ModalShow();
-            // -> Callback : OnConfirm() 
+            // -> Callback : OnConfirm()
 
             return;
         }
@@ -341,7 +343,7 @@ else
 
     protected async Task OnRemoveConfirm(bool bAction)
     {
-        if(bAction)
+        if (bAction)
         {
             string sUser = await sessionStorage.GetItemAsync<string>("EMailAddr");
             int nAffected = await reportSvc.RemoveReportAsync(report.REPORT_ID, sUser);

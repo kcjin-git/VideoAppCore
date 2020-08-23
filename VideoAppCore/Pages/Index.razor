@@ -2,43 +2,13 @@
 
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
-<h1>Hello, world!</h1>
+@using TeamWork.Data.Rpt
+@using TeamWork.Data.Comm
 
-<AuthorizeView>
+@inject IJSRuntime JSRuntime;
 
-    <Authorized>
-
-        Welcome  @context.User.Identity.Name
-
-            @if (context.User.Identity.IsAuthenticated)
-            {
-                <p>
-                    @eMail
-                </p>
-            }
-            else
-            {
-                <p> Not Authorized </p>
-            }
+@inject IReportAsync reportSvc
+@inject ICommonCodeAsync commonSvc
 
 
-    </Authorized>
-
-    <NotAuthorized>
-        Sign up plz.
-    </NotAuthorized>
-</AuthorizeView>
-
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-@code
-{
-    string eMail;
-    protected override async Task OnInitializedAsync()
-    {
-
-       eMail = await sessionStorage.GetItemAsync<string>("EMailAddr");
-
-    }
-}
+<h1>index</h1>

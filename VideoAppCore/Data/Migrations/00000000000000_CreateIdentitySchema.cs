@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace VideoAppCore.Data.Migrations
+namespace TeamWork.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

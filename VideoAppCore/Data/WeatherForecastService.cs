@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Data
+namespace TeamWork.Data
 {
     public class WeatherForecastService
     {

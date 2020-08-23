@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using TeamWork.Data.Comm;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Usr
 {
     public class User : ControlField
     {

@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     /// <summary>
     /// [4][2][2] Dapper를 이용한 ASync CRUD

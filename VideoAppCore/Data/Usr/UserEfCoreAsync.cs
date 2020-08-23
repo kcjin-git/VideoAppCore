@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Usr
 {
     public class UserEfCoreAsync : IUserAsync
     {

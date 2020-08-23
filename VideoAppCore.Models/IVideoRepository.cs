@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace VideoAppCore.Models
+namespace TeamWork.Models
 {
     public interface IVideoRepository
     {

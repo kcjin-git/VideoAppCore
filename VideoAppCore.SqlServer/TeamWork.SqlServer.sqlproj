@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>VideoAppCore.SqlServer</Name>
+    <Name>TeamWork.SqlServer</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{786556d6-57a1-41c0-bd4d-c463bee6cc4d}</ProjectGuid>
@@ -11,8 +11,8 @@
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>VideoAppCore.SqlServer</RootNamespace>
-    <AssemblyName>VideoAppCore.SqlServer</AssemblyName>
+    <RootNamespace>TeamWork.SqlServer</RootNamespace>
+    <AssemblyName>TeamWork.SqlServer</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -22,7 +22,8 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
-    <DacApplicationName>VideoAppCore</DacApplicationName>
+    <DacApplicationName>TeamWork</DacApplicationName>
+    <TargetDatabase>TeamWork.SqlServer</TargetDatabase>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -69,7 +70,7 @@
     <Build Include="COMMON_CODES.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="VideoAppCore.SqlServer.publish.xml" />
-    <None Include="VideoAppCore_1.SqlServer.publish.xml" />
+    <None Include="TeamWork.SqlServer.publish.xml" />
+    <None Include="TeamWork_1.SqlServer.publish.xml" />
   </ItemGroup>
 </Project>

@@ -4,9 +4,12 @@ using System.Configuration;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using VideoAppCore.Data.Models;
 
-namespace VideoAppCore.Data
+using TeamWork.Data.Rpt;
+using TeamWork.Data.Usr;
+using TeamWork.Data.Comm;
+
+namespace TeamWork.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {

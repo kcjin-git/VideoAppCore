@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace VideoAppCore.Data.Models
+namespace TeamWork.Data.Usr
 {
     public interface IUserAsync
     {
