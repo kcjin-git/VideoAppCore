@@ -1,14 +1,95 @@
 ﻿@page "/"
 
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-
-@using TeamWork.Data.Rpt
+@using System.Globalization
+@using TeamWork.Data.Vot
 @using TeamWork.Data.Comm
 
 @inject IJSRuntime JSRuntime;
-
-@inject IReportAsync reportSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IVoteQuestionAsync voteSvc
 @inject ICommonCodeAsync commonSvc
 
 
-<h1>index</h1>
+@if (voteList == null)
+{
+    <p><em>Loading...</em></p>
+    <div id="floatingCirclesG">
+        <div class="f_circleG" id="frotateG_01"></div>
+        <div class="f_circleG" id="frotateG_02"></div>
+        <div class="f_circleG" id="frotateG_03"></div>
+        <div class="f_circleG" id="frotateG_04"></div>
+        <div class="f_circleG" id="frotateG_05"></div>
+        <div class="f_circleG" id="frotateG_06"></div>
+        <div class="f_circleG" id="frotateG_07"></div>
+        <div class="f_circleG" id="frotateG_08"></div>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>질문</th>
+                <th>상태</th>
+                <th>시작일자</th>
+                <th>종료일자</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vote in voteList)
+            {
+                <tr>
+                    <td>@vote.QUESTION</td>
+                    <td>@vote.VOTE_STAT</td>
+                    <td>@vote.EFCT_DATE</td>
+                    <td>@vote.EXPR_DATE</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<AlertModal @ref="alertModal" Title="@ConfirmTitle" Message="@ConfirmMessage" OnConfirmCallback="@OnConfirm" />
+
+@code {
+    private List<VoteQuestion> voteList;
+
+    string sUser = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        sUser = await sessionStorage.GetItemAsync<string>("EMailAddr");
+
+        var name = await sessionStorage.GetItemAsync<string>("EMailAddr");
+
+
+        if (name != null)
+            voteList = await voteSvc.GetVoteQuestionListAsync(name);
+
+        if (voteList == null)
+            voteList = new List<VoteQuestion>();
+
+        StateHasChanged();
+    }
+  
+
+    AlertModal alertModal;
+
+    public string ConfirmTitle { get; set; }
+    public string ConfirmMessage { get; set; }
+
+    protected void ShowMessage(string sTitle, string sMessage)
+    {
+        ConfirmTitle = sTitle;
+        ConfirmMessage = sMessage;
+
+        alertModal.ModalShow();
+    }
+
+    protected void OnConfirm()
+    {
+        //NavigationManager.NavigateTo("/");
+    }
+
+}

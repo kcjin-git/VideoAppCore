@@ -19,6 +19,7 @@ using TeamWork.Models;
 using TeamWork.Data.Rpt;
 using TeamWork.Data.Usr;
 using TeamWork.Data.Comm;
+using TeamWork.Data.Vot;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Blazored.SessionStorage;
@@ -59,21 +60,17 @@ namespace TeamWork
 
             //DI Container에 서비스 등록
             //services.AddTransient<IReportAsync, ReportEfCoreAsync>();
-            
-            services.AddTransient<IUserAsync, UserEfCoreAsync>();
-
-            //services.AddTransient<IVideoRepositoryASync, VideoRepositoryEfCoreASync>();
-
             //services.AddTransient<IReportAsync>(s => new ReportDapperAsync(dataConnectionString));
+            services.AddTransient<IUserAsync, UserEfCoreAsync>();
             services.AddTransient<IReportAsync, ReportDapperAsync>();
             services.AddTransient<ICommonCodeAsync, CommonCodeDapperAsync>();
+            services.AddTransient<IVoteQuestionAsync, VoteQuestionDapperAsync>();
 
+            //인증 & Session 
             services.AddScoped<AuthenticationStateProvider, SiteAuthenticationStateProvider>();
-            
             services.AddBlazoredSessionStorage();
 
             services.AddScoped<ToastService>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

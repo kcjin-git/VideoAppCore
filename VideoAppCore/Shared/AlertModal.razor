@@ -36,6 +36,10 @@
     [Parameter]
     public string Message { get; set; }
 
+    [Parameter]
+    public Action OnConfirmCallback { get; set; }
+
+
     public void ModalShow()
     {
         showModal = true;
@@ -44,10 +48,14 @@
     protected void OnCancel()
     {
         showModal = false;
+
+        OnConfirmCallback?.Invoke();
     }
 
     protected void OnConfirm()
     {
         showModal = false;
+
+        OnConfirmCallback?.Invoke();
     }
 }

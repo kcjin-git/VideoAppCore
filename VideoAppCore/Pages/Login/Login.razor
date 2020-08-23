@@ -23,7 +23,7 @@
             </div>
 
             <!-- Login Form -->
-            <EditForm Model="@user" OnSubmit="@Save">
+            <EditForm Model="@user" OnSubmit="@TryLogin">
                 <InputText type="text" id="email" class="fadeIn second" name="email" placeholder="email" @bind-Value="@user.EMAIL" />
                 <InputText type="text" id="password" class="fadeIn third" name="login" placeholder="password" @bind-Value="@user.PASSWORD"  />
                 <input type="submit" class="fadeIn fourth" value="Log In">
@@ -38,10 +38,11 @@
     </div>
 
 
-
+    <AlertModal @ref="alertModal" Title="@ConfirmTitle" Message="@ConfirmMessage" OnConfirmCallback="@OnConfirm" />
 
 
 @code {
+
 
     User user = new User();
 
@@ -62,7 +63,7 @@
 
     }
 
-    public async Task Save()
+    public async Task TryLogin()
     {
         User userInfo = new User();
         userInfo = await userSvc.LogIn(user.EMAIL, user.PASSWORD);
@@ -76,19 +77,34 @@
         {
             ((SiteAuthenticationStateProvider)AuthenticationStateProvider).SetAuthenticationStateAsync(userInfo.EMAIL, userInfo.USER_NAME, userInfo.ORGN_NAME);
 
-
             await sessionStorage.SetItemAsync("UserName", userInfo.USER_NAME);
             await sessionStorage.SetItemAsync("EMailAddr", userInfo.EMAIL);
             await sessionStorage.SetItemAsync("OrgnName", userInfo.ORGN_NAME);
 
-            //var name = await sessionStorage.GetItemAsync<string>("name");
-
-
-            //await JSRuntime.InvokeVoidAsync("alert", "login succeed");
-
             NavigationManager.NavigateTo("/");
+
+            //ShowMessage("Login Succeed", userInfo.USER_NAME + "님 환영합니다.");
         }
 
     }
+
+    AlertModal alertModal;
+
+    public string ConfirmTitle { get; set; }
+    public string ConfirmMessage { get; set; }
+
+    protected void ShowMessage(string sTitle, string sMessage)
+    {
+        ConfirmTitle = sTitle;
+        ConfirmMessage = sMessage;
+
+        alertModal.ModalShow();
+    }
+
+    protected void OnConfirm()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
 
 }
